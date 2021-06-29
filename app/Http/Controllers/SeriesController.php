@@ -12,10 +12,15 @@ class SeriesController extends Controller
 {
      public function index(Request $request) {
 
-        $series =  Serie::all();
+        $series =  Serie::query()
+        ->orderBy('nome')->get();
+
+        $mensagem = $request->session()->get('mensagem');
+        $request->session()->remove('mensagem');
 
        return view('series.index', [
-           'series' => $series
+           'series' => $series,
+           'mensagem' => $mensagem
        ]);
     }
 
@@ -30,8 +35,11 @@ class SeriesController extends Controller
 
         $serie = new Serie();
         $serie->nome = $nome;
-        var_dump($serie->save());
-        echo "Sério com id $serie->id criada com sucesso ";
+        $serie->save();
+
+        $request->session()->flash(
+            'mensagem',
+            "Sério com id $serie->id criada com sucesso");
 
         return redirect('/series');
     }
